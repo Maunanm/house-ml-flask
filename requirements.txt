@@ -1,5 +1,6 @@
-gradio
-pandas
+Flask
 numpy
-scikit-learn
+pandas
 joblib
+requests
+gunicorn
