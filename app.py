@@ -34,6 +34,8 @@ def download_model_files():
 
 # Download all models before loading
 download_model_files()
+print("=== FILES IN DIRECTORY AFTER DOWNLOAD ===")
+print(os.listdir("."))
 
 # ======= CEK & LOAD MODEL =======
 def load_models():
