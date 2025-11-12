@@ -1,6 +1,14 @@
 {
   "builds": [
-    { "src": "app.py", "use": "@vercel/python" }
+    {
+      "src": "app.py",
+      "use": "@vercel/python",
+      "config": {
+        "runtime": "python3.12",
+        "maxLambdaSize": "250mb",
+        "excludeFiles": "{*.pkl,*.csv,__pycache__/**,venv/**}"
+      }
+    }
   ],
   "routes": [
     { "src": "/(.*)", "dest": "app.py" }
