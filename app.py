@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import joblib
 import os
-
+import requests
 app = Flask(__name__)
 
 # ======= MODEL FILE NAMES =======
@@ -12,6 +12,28 @@ WORTH_MODEL_PATH = 'worth_model.pkl'
 SCALER_PATH = 'feature_scaler.pkl'
 WORTH_MAP_PATH = 'worth_mapping.pkl'
 DATASET_PATH = 'House Price Prediction.csv'  # Path to your CSV dataset
+
+def download_model_files():
+    files = {
+        "price_model.pkl": "https://raw.githubusercontent.com/Maunanm/house-ml-flask/main/price_model.pkl",
+        "worth_model.pkl": "https://raw.githubusercontent.com/Maunanm/house-ml-flask/main/worth_model.pkl",
+        "feature_scaler.pkl": "https://raw.githubusercontent.com/Maunanm/house-ml-flask/main/feature_scaler.pkl",
+        "worth_mapping.pkl": "https://raw.githubusercontent.com/Maunanm/house-ml-flask/main/worth_mapping.pkl"
+    }
+
+    for filename, url in files.items():
+        if not os.path.exists(filename):
+            print(f"Downloading {filename}...")
+            response = requests.get(url)
+            if response.status_code == 200:
+                with open(filename, "wb") as f:
+                    f.write(response.content)
+                print(f"{filename} downloaded.")
+            else:
+                print(f"Failed to download {filename} from {url}")
+
+# Download all models before loading
+download_model_files()
 
 # ======= CEK & LOAD MODEL =======
 def load_models():
