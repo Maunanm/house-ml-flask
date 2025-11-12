@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Property Dataset - House Prediction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Montserrat', sans-serif;
+        }
+        
+        body {
+            background: #F5F5F7;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            width: 100%;
+            height: auto;
+            min-height: 70px;
+            background: #F5F5F7;
+            box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.30);
+            border-bottom-right-radius: 30px;
+            border-bottom-left-radius: 30px;
+            position: fixed;
+            top: -100px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            padding: 10px 50px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            animation: slideDown 0.8s ease-out forwards;
+            animation-delay: 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                top: -100px;
+                opacity: 0;
+            }
+            to {
+                top: 0;
+                opacity: 1;
+            }
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-img {
+            width: 50px;
+            height: 50px;
+            transition: transform 0.5s ease;
+        }
+        
+        .logo-img:hover {
+            transform: rotate(15deg) scale(1.1);
+        }
+        
+        .logo-text {
+            color: black;
+            font-size: 17px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+        }
+        
+        .logo-text:hover {
+            color: #7D6E83;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+        
+        .nav-link {
+            color: #5C5263;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            padding: 5px 0;
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: #A79CB0;
+            transform: translateY(-2px);
+        }
+        
+        .nav-link.active {
+            color: #A79CB0;
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: #A79CB0;
+            bottom: -3px;
+            left: 0;
+            border-radius: 2px;
+            animation: underlineGrow 0.5s ease-out;
+        }
+
+        @keyframes underlineGrow {
+            from {
+                transform: scaleX(0);
+            }
+            to {
+                transform: scaleX(1);
+            }
+        }
+        
+        .estimate-btn {
+            position: relative;
+            padding: 12px 24px;
+            border-radius: 15px;
+            border: 1px solid #7D6E83;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: normal;
+            background: transparent;
+            color: #5C5263;
+            overflow: hidden;
+            box-shadow: 0 0 0 0 transparent;
+            transition: all 0.2s ease-in;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .estimate-btn:hover {
+            background: #7D6E83;
+            color: #fff;
+            box-shadow: 0 0 30px 5px rgba(125, 110, 131, 0.6);
+            transition: all 0.2s ease-out;
+        }
+
+        .estimate-btn:hover::before {
+            animation: sh02 0.5s 0s linear;
+        }
+
+        .estimate-btn::before {
+            content: '';
+            display: block;
+            width: 0px;
+            height: 86%;
+            position: absolute;
+            top: 7%;
+            left: 0%;
+            opacity: 0;
+            background: #fff;
+            box-shadow: 0 0 50px 30px #fff;
+            transform: skewX(-20deg);
+        }
+
+        @keyframes sh02 {
+            from {
+                opacity: 0;
+                left: 0%;
+            }
+            50% {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                left: 100%;
+            }
+        }
+
+        .estimate-btn:active {
+            box-shadow: 0 0 0 0 transparent;
+            transition: box-shadow 0.2s ease-in;
+        }
+        
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 21px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .menu-toggle.active span:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+        }
+        
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .menu-toggle.active span:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+        
+        .menu-toggle span {
+            height: 3px;
+            width: 100%;
+            background-color: #5C5263;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        
+        .hero-section {
+            width: 100%;
+            min-height: 350px;
+            background: linear-gradient(49deg, #7D6E83 0%, #4B4453 50%, #2E2E3A 100%);
+            background-size: 300% 300%;
+            animation: gradientLoop 8s ease infinite, fadeIn 1s ease-out;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 130px 50px 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            margin: 0 auto;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                            linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: 40px 40px;
+            }
+        }
+
+        @keyframes gradientLoop {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .hero-title {
+            color: white;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-family: 'Montserrat';
+            line-height: 1.2;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            animation: titleFadeIn 1s ease-out, float 6s ease-in-out infinite;
+        }
+
+        @keyframes titleFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+        
+        .hero-title.shine-effect {
+            display: inline-block;
+            background: linear-gradient(to right, 
+                rgba(159, 159, 159, 0.8) 0%, 
+                rgba(255, 255, 255, 1) 50%, 
+                rgba(134, 134, 134, 0.8) 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: shineLoop 4s infinite linear;
+            position: relative;
+        }
+        
+        @keyframes shineLoop {
+            0% {
+                background-position: -100% center;
+            }
+            50% {
+                background-position: 100% center;
+            }
+            100% {
+                background-position: -100% center;
+            }
+        }
+        
+        .hero-description {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            font-family: 'Montserrat';
+            max-width: 800px;
+            line-height: 1.5;
+            opacity: 0;
+            filter: blur(5px);
+            animation: fadeInBlur 1.2s ease-out forwards;
+            animation-delay: 0.8s;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        
+        @keyframes fadeInBlur {
+            from {
+                opacity: 0;
+                filter: blur(5px);
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                filter: blur(0);
+                transform: translateY(0);
+            }
+        }
+
+        .dataset-container {
+            padding: 50px;
+            max-width: 1200px;
+            margin: 0 auto;
+            opacity: 0;
+            animation: fadeInUp 1s ease-out forwards;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Dataset table specific styles */
+        .table-wrapper {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+            transform: perspective(1000px) rotateX(-5deg);
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+        }
+
+        .table-wrapper:hover {
+            transform: perspective(1000px) rotateX(0deg);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .dataset-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .dataset-table thead {
+            position: sticky;
+            top: 0;
+            background-color: #354F52;
+            z-index: 1;
+        }
+        
+        .dataset-table th, .dataset-table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+        
+        .dataset-table th {
+            background-color: #354F52;
+            color: white;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dataset-table th::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transform: translateX(-100%);
+        }
+
+        .dataset-table th:hover::after {
+            animation: shine 1.5s infinite;
+        }
+
+        @keyframes shine {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+        
+        .dataset-table tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        
+        .dataset-table tr {
+            transition: all 0.3s ease;
+        }
+        
+        .dataset-table tr:hover {
+            background-color: #f1f1f1;
+            transform: scale(1.005);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .error-message {
+            color: #d9534f;
+            text-align: center;
+            padding: 20px;
+            background-color: #f8d7da;
+            border-radius: 5px;
+            margin: 20px 0;
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            20%, 60% {
+                transform: translateX(-5px);
+            }
+            40%, 80% {
+                transform: translateX(5px);
+            }
+        }
+        
+        .column-descriptions {
+            width: 100%;
+            margin-top: 40px;
+        }
+        
+        .section-title {
+            color: #5C5263;
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 30px;
+            font-family: 'Montserrat';
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #7D6E83, #4B4453, #2E2E3A);
+            border-radius: 2px;
+            transform: scaleX(0);
+            transform-origin: left;
+            animation: titleUnderline 1s ease-out forwards;
+            animation-delay: 0.8s;
+        }
+
+        @keyframes titleUnderline {
+            from {
+                transform: scaleX(0);
+            }
+            to {
+                transform: scaleX(1);
+            }
+        }
+        
+        .description-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+        }
+        
+        .description-item {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .description-item:nth-child(1) {
+            animation: fadeInUpItem 0.8s ease-out forwards;
+            animation-delay: 0.6s;
+        }
+        .description-item:nth-child(2) {
+            animation: fadeInUpItem 0.8s ease-out forwards;
+            animation-delay: 0.8s;
+        }
+        .description-item:nth-child(3) {
+            animation: fadeInUpItem 0.8s ease-out forwards;
+            animation-delay: 1.0s;
+        }
+        .description-item:nth-child(4) {
+            animation: fadeInUpItem 0.8s ease-out forwards;
+            animation-delay: 1.2s;
+        }
+        .description-item:nth-child(5) {
+            animation: fadeInUpItem 0.8s ease-out forwards;
+            animation-delay: 1.4s;
+        }
+
+        @keyframes fadeInUpItem {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .description-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .item-number {
+            width: 49px;
+            height: 49px;
+            background: #7D6E83;
+            border-radius: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+        }
+
+        .description-item:hover .item-number {
+            background: #4B4453;
+            transform: scale(1.1);
+        }
+        
+        .item-content {
+            flex: 1;
+        }
+        
+        .item-title {
+            color: #2E2E2E;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            font-family: 'Montserrat';
+            transition: color 0.3s ease;
+        }
+
+        .description-item:hover .item-title {
+            color: #7D6E83;
+        }
+        
+        .item-text {
+            color: #2E2E2E;
+            font-size: 18px;
+            font-weight: 500;
+            line-height: 1.5;
+            font-family: 'Montserrat';
+        }
+        
+        footer {
+            width: 100%;
+            padding: 20px 0;
+            background: #D9D9D9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #7D6E83, #4B4453, #2E2E3A);
+            animation: footerBorder 3s linear infinite;
+            background-size: 200% 100%;
+        }
+
+        @keyframes footerBorder {
+            0% {
+                background-position: 0% 50%;
+            }
+            100% {
+                background-position: 200% 50%;
+            }
+        }
+        
+        .footer-text {
+            color: #1E1E1E;
+            font-size: 18px;
+            font-weight: 500;
+            font-family: 'Montserrat';
+            opacity: 0;
+            animation: fadeIn 1s ease-out forwards;
+            animation-delay: 0.5s;
+        }
+
+        /* Floating particles background effect */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        @media (max-width: 1200px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-description {
+                font-size: 1.1rem;
+            }
+            
+            .section-title {
+                font-size: 26px;
+            }
+            
+            .item-title {
+                font-size: 22px;
+            }
+            
+            .item-text {
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .navbar {
+                padding: 10px 30px;
+            }
+            
+            .dataset-container {
+                padding: 30px;
+            }
+            
+            .description-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .menu-toggle {
+                display: flex;
+                position: absolute;
+                right: 20px;
+                top: 25px;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                width: 100%;
+                align-items: flex-start;
+                gap: 15px;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.5s ease;
+            }
+            
+            .nav-links.active {
+                max-height: 300px;
+            }
+            
+            .nav-link {
+                width: 100%;
+                padding: 8px 0;
+            }
+            
+            .estimate-btn {
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            .hero-section {
+                padding: 100px 20px 40px;
+                min-height: 300px;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+                margin-bottom: 15px;
+            }
+            
+            .hero-description {
+                font-size: 1rem;
+                margin-bottom: 20px;
+            }
+            
+            .dataset-container {
+                padding: 20px;
+            }
+            
+            .item-number {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+            
+            .item-title {
+                font-size: 20px;
+            }
+            
+            .item-text {
+                font-size: 16px;
+            }
+            
+            .footer-text {
+                font-size: 16px;
+            }
+
+            .table-wrapper {
+                transform: none;
+            }
+
+            .table-wrapper:hover {
+                transform: none;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.8rem;
+            }
+            
+            .hero-description {
+                font-size: 0.9rem;
+            }
+            
+            .section-title {
+                font-size: 22px;
+            }
+            
+            .description-item {
+                gap: 15px;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .footer-text {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating particles background -->
+    <div class="particles" id="particles"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo-container">
+            <img class="logo-img" src="{{ url_for('static', filename='gambar1.png') }}" alt="Logo">
+            <div class="logo-text">House<br/>Prediction</div>
+        </div>
+        <div class="menu-toggle" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="nav-links" id="navLinks">
+            <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+            <a href="{{ url_for('visualization') }}" class="nav-link">Visualization</a>
+            <a href="{{ url_for('dataset') }}" class="nav-link active">Dataset</a>
+            <a href="{{ url_for('about') }}" class="nav-link">About</a>
+            <a href="{{ url_for('prediction') }}" class="estimate-btn">Estimate Now!</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <h1 class="hero-title shine-effect">Property Dataset</h1>
+        <p class="hero-description">Welcome to the Property Dataset Hub, where all the data behind your dream home search comes together. This page provides a clean and structured look at the real estate dataset used across our visualizations and insights.</p>
+    </section>
+
+    <!-- Dataset Section -->
+    <section class="dataset-container">
+        {% if error_message %}
+        <div class="error-message">
+            {{ error_message }}
+        </div>
+        {% else %}
+        <div class="table-wrapper">
+            {{ table_html|safe }}
+        </div>
+        {% endif %}
+        
+        <div class="column-descriptions">
+            <h2 class="section-title">Column Descriptions:</h2>
+            
+            <div class="description-grid">
+                <div class="description-item">
+                    <div class="item-number">1</div>
+                    <div class="item-content">
+                        <h3 class="item-title">LB (Building Area)</h3>
+                        <p class="item-text">The total built-up area in square meters.</p>
+                    </div>
+                </div>
+                
+                <div class="description-item">
+                    <div class="item-number">2</div>
+                    <div class="item-content">
+                        <h3 class="item-title">LT (Land Area)</h3>
+                        <p class="item-text">The total land area in square meters.</p>
+                    </div>
+                </div>
+                
+                <div class="description-item">
+                    <div class="item-number">3</div>
+                    <div class="item-content">
+                        <h3 class="item-title">KT (Bedrooms)</h3>
+                        <p class="item-text">The number of bedrooms.</p>
+                    </div>
+                </div>
+                
+                <div class="description-item">
+                    <div class="item-number">4</div>
+                    <div class="item-content">
+                        <h3 class="item-title">KM (Bathrooms)</h3>
+                        <p class="item-text">The number of bathrooms.</p>
+                    </div>
+                </div>
+                
+                <div class="description-item">
+                    <div class="item-number">5</div>
+                    <div class="item-content">
+                        <h3 class="item-title">GRS (Garage)</h3>
+                        <p class="item-text">The number of garage spaces.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p class="footer-text">Copyright© 2025 House Prediction. All Right Reserved</p>
+    </footer>
+
+    <script>
+        // Toggle mobile menu
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            const menuToggle = document.querySelector('.menu-toggle');
+            navLinks.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        }
+
+        // Close menu when clicking on a link
+        document.querySelectorAll('.nav-link, .estimate-btn').forEach(link => {
+            link.addEventListener('click', () => {
+                const navLinks = document.getElementById('navLinks');
+                const menuToggle = document.querySelector('.menu-toggle');
+                if (window.innerWidth <= 768) {
+                    navLinks.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                }
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const navLinks = document.getElementById('navLinks');
+            const menuToggle = document.querySelector('.menu-toggle');
+            if (window.innerWidth > 768 && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                menuToggle.classList.remove('active');
+            }
+        });
+
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = Math.floor(window.innerWidth / 10);
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // Random size between 1px and 3px
+                const size = Math.random() * 2 + 1;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // Random position
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100}%`;
+                
+                // Random animation duration and delay
+                const duration = Math.random() * 20 + 10;
+                const delay = Math.random() * 5;
+                particle.style.animation = `float ${duration}s ease-in-out ${delay}s infinite`;
+                
+                // Add to container
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // Initialize particles when DOM is loaded
+        document.addEventListener('DOMContentLoaded', createParticles);
+
+        // Add hover effect to table rows
+        document.addEventListener('DOMContentLoaded', function() {
+            const tableRows = document.querySelectorAll('.dataset-table tr');
+            
+            tableRows.forEach(row => {
+                row.addEventListener('mouseenter', () => {
+                    row.style.transform = 'scale(1.005)';
+                    row.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+                });
+                
+                row.addEventListener('mouseleave', () => {
+                    row.style.transform = '';
+                    row.style.boxShadow = '';
+                });
+            });
+        });
+
+        // Add scroll animation to elements
+        document.addEventListener('DOMContentLoaded', function() {
+            const animateOnScroll = function() {
+                const elements = document.querySelectorAll('.description-item');
+                
+                elements.forEach(element => {
+                    const elementPosition = element.getBoundingClientRect().top;
+                    const windowHeight = window.innerHeight;
+                    
+                    if (elementPosition < windowHeight - 100) {
+                        element.style.animationPlayState = 'running';
+                    }
+                });
+            };
+            
+            window.addEventListener('scroll', animateOnScroll);
+            animateOnScroll(); // Run once on load
+        });
+    </script>
+</body>
+</html>

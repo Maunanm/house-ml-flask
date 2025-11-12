@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Price Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Montserrat', sans-serif;
+        }
+        
+        body {
+            background: #F5F5F7;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+    width: 100%;
+    height: auto;
+    min-height: 70px;
+    background: #F5F5F7;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.30);
+    border-bottom-right-radius: 30px;
+    border-bottom-left-radius: 30px;
+    position: fixed;
+    top: -100px; /* Awalnya disembunyikan di atas */
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    padding: 10px 50px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    animation: slideDown 0.8s ease-out forwards; /* Animasi turun */
+    animation-delay: 0.3s; /* Jeda sebelum animasi dimulai */
+}
+
+@keyframes slideDown {
+    from {
+        top: -100px;
+        opacity: 0;
+    }
+    to {
+        top: 0;
+        opacity: 1;
+    }
+}
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-img {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .logo-text {
+            color: black;
+            font-size: 17px;
+            font-weight: 700;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+        
+        .nav-link {
+            color: #5C5263;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            padding: 5px 0;
+        }
+        
+        .nav-link:hover {
+            color: #A79CB0;
+        }
+        
+        .nav-link.active {
+            color: #A79CB0;
+            position: relative;
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: #A79CB0;
+            bottom: -3px;
+            left: 0;
+            border-radius: 2px;
+        }
+        
+        .estimate-btn {
+            background: #5C5263;
+            color: #F5F5F7;
+            font-size: 15px;
+            font-weight: 700;
+            padding: 12px 24px;
+            border-radius: 15px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-block;
+            text-align: center;
+        }
+        
+        .estimate-btn:hover {
+            background: #7D6E83;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 21px;
+            cursor: pointer;
+        }
+        
+        .menu-toggle span {
+            height: 3px;
+            width: 100%;
+            background-color: #5C5263;
+            border-radius: 3px;
+        }
+        
+.hero-section {
+    width: 100%;
+    min-height: 350px;
+    background: linear-gradient(49deg, #7D6E83 0%, #4B4453 50%, #2E2E3A 100%);
+    background-size: 300% 300%; /* Diperbesar untuk animasi */
+    animation: gradientLoop 8s ease infinite; /* Animasi gradient */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 130px 50px 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    margin: 0 auto;
+}
+
+.hero-section::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                      linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+    /* Pattern TIDAK ikut bergerak */
+}
+
+@keyframes gradientLoop {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+        
+        .hero-title {
+            color: white;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-family: 'Montserrat';
+            line-height: 1.2;
+        }
+        /* Animasi Shine Dua Arah (Kiri-Kanan-Kiri) */
+.hero-title.shine-effect {
+    display: inline-block;
+    background: linear-gradient(to right, 
+        rgba(159, 159, 159, 0.8) 0%, 
+        rgba(255, 255, 255, 1) 50%, 
+        rgba(134, 134, 134, 0.8) 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shineLoop 4s infinite linear;
+    position: relative; /* Untuk memastikan efek bekerja dengan baik */
+}
+
+@keyframes shineLoop {
+    0% {
+        background-position: -100% center; /* Mulai dari kiri (di luar teks) */
+    }
+    50% {
+        background-position: 100% center;  /* Sampai ke kanan */
+    }
+    100% {
+        background-position: -100% center; /* Kembali ke kiri */
+    }
+}
+        
+        .hero-description {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            font-family: 'Montserrat';
+            max-width: 800px;
+            line-height: 1.5;
+                        opacity: 0;
+    filter: blur(5px);
+    animation: fadeInBlur 1.2s ease-out forwards;
+    animation-delay: 0.8s; /* Delay lebih panjang untuk description */
+        }
+        
+@keyframes fadeInBlur {
+    from {
+        opacity: 0;
+        filter: blur(5px);
+    }
+    to {
+        opacity: 1;
+        filter: blur(0);
+    }
+}
+        
+        .form-section {
+            padding: 50px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+        }
+        
+        .input-group label {
+            display: block;
+            color: #2E2E2E;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-family: 'Montserrat';
+        }
+        
+        .input-container {
+            display: flex;
+        }
+        
+        .input-field {
+            flex-grow: 1;
+            background-color: #E8E0EB;
+            border: none;
+            border-radius: 10px;
+            padding: 15px;
+            color: #5C5263;
+            font-size: 20px;
+            font-weight: 600;
+            font-family: 'Montserrat';
+        }
+        
+        .btn-adjust {
+    width: 50px;
+    height: 50px;
+    background-color: #7D6E83;
+    color: white;
+    border: none;
+    border-radius: 10px; /* Tetap 10px seperti sebelumnya */
+    font-size: 24px;
+    font-weight: 600;
+    margin-left: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    box-shadow:
+        0px 10px 10px rgba(125, 110, 131, 0.8) inset,
+        0px 5px 10px rgba(5, 5, 5, 0.212),
+        0px -10px 10px rgba(125, 110, 131, 0.8) inset;
+    transition: all 0.2s ease;
+}
+
+.btn-adjust::before {
+    width: 70%;
+    height: 2px;
+    position: absolute;
+    background-color: rgba(250, 250, 250, 0.678);
+    content: "";
+    filter: blur(1px);
+    top: 7px;
+    border-radius: 50%;
+}
+
+.btn-adjust::after {
+    width: 70%;
+    height: 2px;
+    position: absolute;
+    background-color: rgba(250, 250, 250, 0.137);
+    content: "";
+    filter: blur(1px);
+    bottom: 7px;
+    border-radius: 50%;
+}
+
+/* Animasi saat tombol ditekan */
+.btn-adjust:active {
+    animation: jello-horizontal 0.4s both;
+    background-color: #5C5263;
+}
+
+@keyframes jello-horizontal {
+    0% {
+        transform: scale3d(1, 1, 1);
+    }
+    30% {
+        transform: scale3d(1.15, 0.85, 1);
+    }
+    40% {
+        transform: scale3d(0.85, 1.15, 1);
+    }
+    50% {
+        transform: scale3d(1.05, 0.95, 1);
+    }
+    65% {
+        transform: scale3d(0.95, 1.05, 1);
+    }
+    75% {
+        transform: scale3d(1.02, 0.98, 1);
+    }
+    100% {
+        transform: scale3d(1, 1, 1);
+    }
+}
+        
+        /* Animasi untuk prediction button */
+@keyframes scaling {
+  20% {
+    height: 1.5em;
+  }
+  80% {
+    height: 1.5em;
+  }
+  100% {
+    height: 3.3em;
+  }
+}
+
+/* Hapus style prediction-btn yang lama */
+.prediction-btn {
+  font-size: 18px;
+  background-color: transparent;
+  width: 13em;
+  height: 3.3em;
+  border: 2px solid #5C5263;
+  border-radius: 25px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: #5C5263;
+  padding: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  font-family: 'Montserrat';
+  margin: 40px auto;
+}
+
+.prediction-btn .txt {
+  transition: .4s ease-in-out;
+  position: absolute;
+}
+
+.prediction-btn .txt2 {
+  transform: translateY(1em) scale(0);
+  color: #F5F5F7; /* Warna teks success */
+  position: absolute;
+}
+
+.prediction-btn .loader-container {
+  height: 100%;
+  width: 100%;
+  background-color: transparent;
+  border-radius: inherit;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.prediction-btn .loader-container .loader {
+  height: 100%;
+  width: 100%;
+  background-color: #5C5263;
+  border-radius: inherit;
+  transform: translateX(-13em);
+}
+
+.prediction-btn:focus {
+  transition: .4s ease-in-out .4s;
+  animation: scaling 1.5s ease-in-out 0s 1 both;
+}
+
+.prediction-btn:focus .txt {
+  position: absolute;
+  transform: translateY(-5em);
+  transition: .4s ease-in-out;
+}
+
+.prediction-btn:focus .txt2 {
+  transform: translateY(0) scale(1);
+  transition: .3s ease-in-out 1.7s;
+}
+
+.prediction-btn:focus .loader {
+  display: block;
+  transform: translate(0);
+  transition: .8s cubic-bezier(0,.4,1,.28) .4s;
+}
+        
+        .results-section {
+            padding: 0 50px 50px;
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .results-section h2 {
+            color: #2E2E2E;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            font-family: 'Montserrat';
+        }
+        
+        .chart-placeholder {
+            background-color: #D9D9D9;
+            height: 300px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #5C5263;
+            font-weight: bold;
+            font-size: 20px;
+            font-family: 'Montserrat';
+        }
+        
+        .price-display {
+            background-color: #A79CB0;
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 30px;
+            font-family: 'Montserrat';
+            display: none;
+        }
+        
+        footer {
+            width: 100%;
+            padding: 20px 0;
+            background: #D9D9D9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+        }
+        
+        .footer-text {
+            color: #1E1E1E;
+            font-size: 18px;
+            font-weight: 500;
+            font-family: 'Montserrat';
+        }
+        
+        @media (max-width: 1200px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-description {
+                font-size: 1.1rem;
+            }
+            
+            .input-group label {
+                font-size: 22px;
+            }
+            
+            .input-field {
+                font-size: 18px;
+            }
+            
+            .btn-adjust {
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+            
+            .prediction-btn {
+                font-size: 16px;
+            }
+            
+            .results-section h2 {
+                font-size: 24px;
+            }
+            
+            .price-display {
+                font-size: 20px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .navbar {
+                padding: 10px 30px;
+            }
+            
+            .form-section {
+                padding: 30px;
+            }
+            
+            .form-grid {
+                gap: 20px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .menu-toggle {
+                display: flex;
+                position: absolute;
+                right: 20px;
+                top: 25px;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                width: 100%;
+                align-items: flex-start;
+                gap: 15px;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.5s ease;
+            }
+            
+            .nav-links.active {
+                max-height: 300px;
+            }
+            
+            .nav-link {
+                width: 100%;
+                padding: 8px 0;
+            }
+            
+            .estimate-btn {
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            .hero-section {
+                padding: 100px 20px 40px;
+                min-height: 300px;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+                margin-bottom: 15px;
+            }
+            
+            .hero-description {
+                font-size: 1rem;
+                margin-bottom: 20px;
+            }
+            
+            .form-section {
+                padding: 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-group label {
+                font-size: 20px;
+            }
+            
+            .input-field {
+                font-size: 16px;
+                padding: 12px;
+            }
+            
+            .btn-adjust {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            
+            .prediction-btn {
+                font-size: 15px;
+                padding: 12px 24px;
+            }
+            
+            .results-section {
+                padding: 0 20px 40px;
+            }
+            
+            .results-section h2 {
+                font-size: 22px;
+            }
+            
+            .chart-placeholder {
+                height: 250px;
+            }
+            
+            .price-display {
+                font-size: 18px;
+            }
+            
+            .footer-text {
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.8rem;
+            }
+            
+            .hero-description {
+                font-size: 0.9rem;
+            }
+            
+            .input-group label {
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+            
+            .input-field {
+                font-size: 14px;
+            }
+            
+            .btn-adjust {
+                width: 35px;
+                height: 35px;
+                font-size: 16px;
+            }
+            
+            .prediction-btn {
+                margin: 30px auto;
+            }
+            
+            .chart-placeholder {
+                height: 200px;
+                font-size: 16px;
+            }
+            
+            .price-display {
+                font-size: 16px;
+            }
+            
+            .footer-text {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+    <div class="logo-container">
+        <img class="logo-img" src="{{ url_for('static', filename='gambar1.png') }}" alt="Logo">
+        <div class="logo-text">House<br/>Prediction</div>
+    </div>
+    <div class="menu-toggle" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+    <div class="nav-links" id="navLinks">
+        <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+        <a href="{{ url_for('visualization') }}" class="nav-link">Visualization</a>
+        <a href="{{ url_for('dataset') }}" class="nav-link">Dataset</a>
+        <a href="{{ url_for('about') }}" class="nav-link ">About</a>
+        <a href="{{ url_for('prediction') }}" class="estimate-btn">Estimate Now!</a>
+    </div>
+</nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <h1 class="hero-title shine-effect">Try Our House Price Predictor</h1>
+        <p class="hero-description">Enter your property details and get an instant price prediction powered by machine learning.</p>
+    </section>
+
+    <!-- Form Section -->
+    <section class="form-section">
+        <div class="form-grid">
+            <!-- Building Area -->
+            <div class="input-group">
+                <label>Building Area (m²)</label>
+                <div class="input-container">
+                    <input type="text" class="input-field" placeholder="Input Building Area (m²)" id="building-area">
+                    <button class="btn-adjust" onclick="adjustValue('building-area', -1)">-</button>
+                    <button class="btn-adjust" onclick="adjustValue('building-area', 1)">+</button>
+                </div>
+            </div>
+
+            <!-- Bathrooms -->
+            <div class="input-group">
+                <label>Number of Bathrooms</label>
+                <div class="input-container">
+                    <input type="text" class="input-field" placeholder="Input Number of Bathrooms" id="bathrooms">
+                    <button class="btn-adjust" onclick="adjustValue('bathrooms', -1)">-</button>
+                    <button class="btn-adjust" onclick="adjustValue('bathrooms', 1)">+</button>
+                </div>
+            </div>
+
+            <!-- Land Area -->
+            <div class="input-group">
+                <label>Land Area (m²)</label>
+                <div class="input-container">
+                    <input type="text" class="input-field" placeholder="Input Land Area (m²)" id="land-area">
+                    <button class="btn-adjust" onclick="adjustValue('land-area', -1)">-</button>
+                    <button class="btn-adjust" onclick="adjustValue('land-area', 1)">+</button>
+                </div>
+            </div>
+
+            <!-- Garages -->
+            <div class="input-group">
+                <label>Number of Garages</label>
+                <div class="input-container">
+                    <input type="text" class="input-field" placeholder="Input Number of Garages" id="garages">
+                    <button class="btn-adjust" onclick="adjustValue('garages', -1)">-</button>
+                    <button class="btn-adjust" onclick="adjustValue('garages', 1)">+</button>
+                </div>
+            </div>
+
+            <!-- Bedrooms -->
+            <div class="input-group">
+                <label>Number of Bedrooms</label>
+                <div class="input-container">
+                    <input type="text" class="input-field" placeholder="Input Number of Bedrooms" id="bedrooms">
+                    <button class="btn-adjust" onclick="adjustValue('bedrooms', -1)">-</button>
+                    <button class="btn-adjust" onclick="adjustValue('bedrooms', 1)">+</button>
+                </div>
+            </div>
+        </div>
+
+        <button class="prediction-btn" onclick="calculatePrediction()">
+    <span class="txt">Price Estimate</span>
+    <span class="txt2">Success</span>
+    <div class="loader-container">
+        <div class="loader"></div>
+    </div>
+</button>
+    </section>
+
+    <!-- Results Section -->
+    <section class="results-section">
+        <h2>House Price Estimate</h2>
+        <div class="price-display" id="price-display">
+            Estimated Price: <span id="predicted-price">0</span>
+        </div>
+        <div class="worth-it-display" id="worth-it-display" style="display: none; margin-top: 20px; padding: 10px; border-radius: 5px; text-align: center;">
+            Recommendation: <span id="worth-it-label" style="font-weight: bold;"></span>
+        </div>
+    </section>
+    
+
+    <!-- Footer -->
+    <footer>
+        <p class="footer-text">Copyright© 2025 House Prediction. All Right Reserved</p>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+        
+        // Close menu when clicking on a link
+        document.querySelectorAll('.nav-link, .estimate-btn').forEach(link => {
+            link.addEventListener('click', () => {
+                const navLinks = document.getElementById('navLinks');
+                if (window.innerWidth <= 768) {
+                    navLinks.classList.remove('active');
+                }
+            });
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const navLinks = document.getElementById('navLinks');
+            if (window.innerWidth > 768 && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+            }
+        });
+
+        // Set initial values to 0
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('building-area').value = '0';
+            document.getElementById('bathrooms').value = '0';
+            document.getElementById('land-area').value = '0';
+            document.getElementById('garages').value = '0';
+            document.getElementById('bedrooms').value = '0';
+        });
+
+        // Adjust value function
+        function adjustValue(fieldId, change) {
+            const field = document.getElementById(fieldId);
+            let currentValue = parseInt(field.value) || 0;
+            currentValue += change;
+            if (currentValue < 0) currentValue = 0;
+            field.value = currentValue;
+        }
+
+        // Calculate prediction using the actual model
+        async function calculatePrediction() {
+            const btn = document.querySelector('.prediction-btn');
+    btn.focus(); // Trigger animasi
+            try {
+                // Get values from inputs
+                const buildingArea = parseInt(document.getElementById('building-area').value) || 0;
+                const bathrooms = parseInt(document.getElementById('bathrooms').value) || 0;
+                const landArea = parseInt(document.getElementById('land-area').value) || 0;
+                const garages = parseInt(document.getElementById('garages').value) || 0;
+                const bedrooms = parseInt(document.getElementById('bedrooms').value) || 0;
+                // [TAMBAHKAN VALIDASI INI] 
+        if (buildingArea < 40 || buildingArea > 1126 ||
+            landArea < 25 || landArea > 1400 ||
+            bathrooms < 1 || bathrooms > 10 ||
+            bedrooms < 2 || bedrooms > 10 ||
+            garages < 0 || garages > 10) {
+            setTimeout(() => {
+                document.getElementById('predicted-price').textContent = "Inputan tidak valid";
+                document.getElementById('price-display').style.display = 'block';
+                document.getElementById('worth-it-display').style.display = 'none';
+                document.querySelector('.results-section').scrollIntoView({ behavior: 'smooth' });
+            }, 2000);
+            return;
+        }  
+                // Call Flask prediction endpoint
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        building_area: buildingArea,
+                        bathrooms: bathrooms,
+                        land_area: landArea,
+                        garages: garages,
+                        bedrooms: bedrooms
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    setTimeout(() => {
+                    // Display the price
+                    document.getElementById('predicted-price').textContent = result.formatted_price;
+                    document.getElementById('price-display').style.display = 'block';
+                    
+                    // Display worth-it recommendation
+                    const worthItLabel = document.getElementById('worth-it-label');
+                    worthItLabel.textContent = result.worth_it_label;
+                    worthItLabel.style.color = result.worth_it ? 'green' : 'red';
+                    document.getElementById('worth-it-display').style.display = 'block';
+                    
+                    // Scroll to results
+                    document.querySelector('.results-section').scrollIntoView({ behavior: 'smooth' });
+                }, 2000); // Sesuaikan dengan durasi animasi
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                alert('An error occurred: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

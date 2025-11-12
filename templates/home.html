@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Prediction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Montserrat', sans-serif;
+        }
+        
+        body {
+            background: #F5F5F7;
+            position: relative;
+            min-height: 100vh;
+        }
+        /* Welcome Overlay */
+.welcome-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    padding-bottom: 0px;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s ease;
+}
+
+.welcome-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.welcome-image {
+    max-width: 100%;
+    max-height: 100vh;
+    cursor: pointer;
+    transform: translateY(20px);
+    transition: transform 0.5s ease;
+}
+
+.welcome-overlay.active .welcome-image {
+    transform: translateY(0);
+}
+
+/* Blur effect for main content when welcome is active */
+body.welcome-active {
+    overflow: hidden;
+}
+
+body.welcome-active main {
+    filter: blur(5px);
+}
+        
+                .navbar {
+    width: 100%;
+    height: auto;
+    min-height: 70px;
+    background: #F5F5F7;
+    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.30);
+    border-bottom-right-radius: 30px;
+    border-bottom-left-radius: 30px;
+    position: fixed;
+    top: -100px; /* Awalnya disembunyikan di atas */
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    padding: 10px 50px;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    animation: slideDown 0.8s ease-out forwards; /* Animasi turun */
+    animation-delay: 0.3s; /* Jeda sebelum animasi dimulai */
+}
+
+@keyframes slideDown {
+    from {
+        top: -100px;
+        opacity: 0;
+    }
+    to {
+        top: 0;
+        opacity: 1;
+    }
+}
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-img {
+            width: 50px;
+            height: 50px;
+        }
+        
+        .logo-text {
+            color: black;
+            font-size: 17px;
+            font-weight: 700;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+        
+        .nav-link {
+            color: #5C5263;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            padding: 5px 0;
+        }
+        
+        .nav-link:hover {
+            color: #A79CB0;
+        }
+        
+        .nav-link.active {
+            color: #A79CB0;
+            position: relative;
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: #A79CB0;
+            bottom: -3px;
+            left: 0;
+            border-radius: 2px;
+        }
+        
+        /* Updated Estimate Now Button Style - Purple Version */
+.estimate-btn {
+    position: relative;
+    padding: 12px 24px; /* Pertahankan padding asal */
+    border-radius: 15px; /* Pertahankan kelengkungan */
+    border: 1px solid #7D6E83; /* Warna ungu */
+    font-size: 15px; /* Pertahankan ukuran font */
+    font-weight: 700; /* Pertahankan ketebalan font */
+    letter-spacing: normal; /* Hapus letter-spacing 2px */
+    background: transparent;
+    color: #5C5263; /* Warna teks ungu tua */
+    overflow: hidden;
+    box-shadow: 0 0 0 0 transparent;
+    -webkit-transition: all 0.2s ease-in;
+    -moz-transition: all 0.2s ease-in;
+    transition: all 0.2s ease-in;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.estimate-btn:hover {
+    background: #7D6E83; /* Warna ungu */
+    color: #fff;
+    box-shadow: 0 0 30px 5px rgba(125, 110, 131, 0.6); /* Efek glow ungu */
+    -webkit-transition: all 0.2s ease-out;
+    -moz-transition: all 0.2s ease-out;
+    transition: all 0.2s ease-out;
+    transform: none; /* Hapus translateY(-2px) */
+}
+
+.estimate-btn:hover::before {
+    -webkit-animation: sh02 0.5s 0s linear;
+    -moz-animation: sh02 0.5s 0s linear;
+    animation: sh02 0.5s 0s linear;
+}
+
+.estimate-btn::before {
+    content: '';
+    display: block;
+    width: 0px;
+    height: 86%;
+    position: absolute;
+    top: 7%;
+    left: 0%;
+    opacity: 0;
+    background: #fff;
+    box-shadow: 0 0 50px 30px #fff;
+    -webkit-transform: skewX(-20deg);
+    -moz-transform: skewX(-20deg);
+    -ms-transform: skewX(-20deg);
+    -o-transform: skewX(-20deg);
+    transform: skewX(-20deg);
+}
+
+@keyframes sh02 {
+    from {
+        opacity: 0;
+        left: 0%;
+    }
+
+    50% {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+        left: 100%;
+    }
+}
+
+.estimate-btn:active {
+    box-shadow: 0 0 0 0 transparent;
+    -webkit-transition: box-shadow 0.2s ease-in;
+    -moz-transition: box-shadow 0.2s ease-in;
+    transition: box-shadow 0.2s ease-in;
+}          
+        
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 21px;
+            cursor: pointer;
+        }
+        
+        .menu-toggle span {
+            height: 3px;
+            width: 100%;
+            background-color: #5C5263;
+            border-radius: 3px;
+        }
+        
+        .hero-section {
+    width: 100%;
+    min-height: 650px;
+    background: linear-gradient(49deg, #7D6E83 0%, #4B4453 50%, #2E2E3A 100%);
+    background-size: 300% 300%; /* Diperbesar untuk animasi */
+    animation: gradientLoop 8s ease infinite; /* Animasi gradient */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 130px 50px 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    gap: 30px;
+    overflow: hidden;
+    border-radius: 10px;
+    margin: 0 auto;
+}
+
+.hero-section::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                    linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 20px 20px;
+    pointer-events: none;
+}
+.hero-content {
+    width: 50%;
+    color: white;
+    text-align: left; /* Menjaga alignment teks */
+    z-index: 1; /* Memastikan konten di atas background pattern */
+    opacity: 0; /* Ditambahkan */
+}
+/* ANIMASI BARU - Slide Right with Fade */
+@keyframes slideRightFade {
+    from {
+        opacity: 0;
+        transform: translateX(-50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Class untuk animasi */
+.slide-right-fade {
+    animation: slideRightFade 1s ease-out forwards;
+}
+
+/* Pastikan hero-content awalnya tersembunyi */
+
+@keyframes gradientLoop {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            font-family: 'Montserrat';
+            line-height: 1.2;
+            display: inline-block;
+        }
+
+/* Animasi Shine Dua Arah (Kiri-Kanan-Kiri) */
+.hero-title.shine-effect {
+    display: inline-block;
+    background: linear-gradient(to right, 
+        rgba(159, 159, 159, 0.8) 0%, 
+        rgba(255, 255, 255, 1) 50%, 
+        rgba(134, 134, 134, 0.8) 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shineLoop 4s infinite linear;
+}
+
+@keyframes shineLoop {
+    0% {
+        background-position: -100% center; /* Mulai dari kiri (di luar teks) */
+    }
+    50% {
+        background-position: 100% center;  /* Sampai ke kanan */
+    }
+    100% {
+        background-position: -100% center; /* Kembali ke kiri */
+    }
+}
+        
+        .hero-description {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 40px;
+            font-family: 'Montserrat';
+            text-align: justify;
+            width: 90%;
+            line-height: 1.5;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .predict-btn {
+    position: relative;
+    padding: 12px 24px;
+    padding-right: 3.3em; /* Space for icon */
+    border-radius: 15px; /* Tetap sama dengan aslinya */
+    font-size: 15px; /* Tetap sama */
+    font-weight: 700; /* Tetap sama */
+    background: white;
+    color: #5C5263;
+    border: none;
+    letter-spacing: normal;
+    display: flex;
+    align-items: center;
+    box-shadow: inset 0 0 1.6em -0.6em white;
+    overflow: hidden;
+    height: auto;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s ease-in;
+}
+
+.predict-btn .icon {
+    background: #5C5263;
+    margin-left: 1em;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 2.2em;
+    width: 2.2em;
+    border-radius: 0.7em;
+    box-shadow: 0.1em 0.1em 0.6em 0.2em white;
+    right: 0.3em;
+    transition: all 0.3s;
+}
+
+.predict-btn:hover .icon {
+    width: calc(100% - 0.6em);
+}
+
+.predict-btn .icon svg {
+    width: 1.1em;
+    transition: transform 0.3s;
+    color: white;
+}
+
+.predict-btn:hover .icon svg {
+    transform: translateX(0.1em);
+}
+
+.predict-btn:active .icon {
+    transform: scale(0.95);
+}
+
+.predict-btn:hover {
+    background: white;
+    box-shadow: 0 0 30px 5px white;
+}
+
+        /* Style untuk tombol Learn How It Works dengan animasi Uiverse.io */
+.learn-btn {
+    position: relative;
+    display: block;
+    padding: 12px 24px; /* Tetap sama dengan aslinya */
+    font-size: 15px; /* Tetap sama */
+    font-weight: 700; /* Tetap sama */
+    background: transparent;
+    cursor: pointer;
+    user-select: none;
+    overflow: hidden;
+    color: white; /* Warna teks tetap putih */
+    z-index: 1;
+    font-family: inherit;
+    border-radius: 15px; /* Tetap sama */
+    text-decoration: none;
+    text-align: center;
+    border: none;
+    height: auto;
+    width: auto;
+}
+
+.learn-btn-border {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    z-index: -1;
+    border: 2px solid white; /* Border putih */
+    border-radius: 15px; /* Tetap sama */
+    box-sizing: border-box;
+}
+
+.learn-btn-border::before {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 8%;
+    height: 500%;
+    background: rgba(255, 255, 255, 0.2);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-60deg);
+    transition: all 0.3s;
+}
+
+.learn-btn:hover .learn-btn-border::before {
+    transform: translate(-50%, -50%) rotate(-90deg);
+    width: 100%;
+    background: white;
+}
+
+.learn-btn:hover {
+    color: #5C5263; /* Warna teks saat hover (sesuai warna asli) */
+}
+
+.learn-btn:active .learn-btn-border::before {
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.learn-btn-text {
+    position: relative;
+    z-index: 2;
+}
+        
+        .hero-image-container {
+            flex: 1;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            animation: slideLeftFade 1.2s ease-out forwards;
+    opacity: 0; /* Mulai dengan invisible */
+     position: relative;
+    perspective: 1000px;
+    transform-style: preserve-3d;
+        }
+
+        /* Animasi Slide Left with Fade */
+@keyframes slideLeftFade {
+    from {
+        opacity: 0;
+        transform: translateX(50px); /* Mulai dari 50px ke kanan */
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0); /* Kembali ke posisi normal */
+    }
+}
+        
+        .hero-image {
+            width: 100%;
+            max-width: 626px;
+            height: auto;
+            border-radius: 20px;
+            object-fit: cover;
+            transition: transform 0.5s ease-out;
+    transform-style: preserve-3d;
+    will-change: transform;
+    border-radius: 20px;
+        }
+
+.hero-image-container:hover .hero-image {
+    transform: scale(1.02);
+}
+
+        .features-title {
+            text-align: center;
+            color: #5C5263;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 80px 0;
+            font-family: 'Montserrat';
+        }
+        
+        .features-container {
+            cursor: pointer;
+            position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 40px;
+    padding: 0 50px;
+    margin-bottom: 100px;
+    min-height: 500px; /* Untuk ruang animasi awal */
+        }
+        
+        .feature-card {
+           width: 340px;
+    min-height: 460px;
+    background: linear-gradient(#fff2, transparent);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 25px rgba(0, 0, 0, 0.25);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    transition: all 0.5s ease;
+    transform: rotate(calc(var(--r) * 1deg));
+    margin: 0 -45px;
+    overflow: hidden;
+    position: relative;
+        }
+        .feature-card:nth-child(even) {
+    transform: rotateY(-15deg) rotateX(10deg) translateZ(0);
+}
+
+.feature-card.active {
+    transform: rotate(0deg);
+    margin: 0 10px;
+}
+
+.feature-card::before {
+    content: attr(data-text);
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.05);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-weight: 600;
+}
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .feature-img-container {
+            width: 100%;
+            height: 200px;
+            background: #D9D9D9;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .feature-card:hover .feature-img {
+            transform: scale(1.05);
+        }
+        
+        .feature-content {
+            width: 100%;
+            background: #A79CB0;
+            padding: 30px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .feature-title {
+            color: #1E1E1E;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-family: 'Montserrat';
+            text-align: center;
+            width: 100%;
+        }
+        
+        .feature-description {
+            color: #1E1E1E;
+            font-size: 18px;
+            font-weight: 500;
+            text-align: center;
+            font-family: 'Montserrat';
+            line-height: 1.5;
+            width: 100%;
+        }
+        
+        .how-it-works {
+            padding: 0 50px;
+            margin-bottom: 100px;
+            position: relative;
+        }
+        
+        .how-it-works-title {
+            color: #5C5263;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 40px;
+            font-family: 'Montserrat';
+        }
+        
+        .how-it-works-description {
+            color: #2E2E2E;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 60px;
+            text-align: justify;
+            font-family: 'Montserrat';
+            width: 60%;
+            line-height: 1.5;
+        }
+        
+        .steps-container {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            width: 60%;
+        }
+        
+        .step {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            transition: transform 0.3s ease;
+        }
+        
+        .step:hover {
+            transform: translateX(10px);
+        }
+        
+        .step-number {
+            width: 49px;
+            height: 49px;
+            background: #7D6E83;
+            border-radius: 100px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            flex-shrink: 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .step-content {
+            color: #2E2E2E;
+        }
+        
+        .step-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-family: 'Montserrat';
+        }
+        
+        .step-description {
+            font-size: 20px;
+            font-weight: 500;
+            font-family: 'Montserrat';
+            line-height: 1.5;
+        }
+        
+        .how-it-works-image {
+            position: absolute;
+            right: 50px;
+            top: 120px;
+            width: 400px;
+            height: 400px;
+            border-radius: 20px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+             opacity: 0; /* Start invisible */
+              transform: translateX(50px);
+    transform-style: preserve-3d;
+    perspective: 1000px;
+    transition: transform 0.5s ease-out;
+        }
+
+        /* Animation for how-it-works image */
+.how-it-works-image.animate {
+    animation: slideLeftFade 1.2s ease-out forwards;
+    opacity: 1;
+    transform: translateX(0);
+}
+
+@keyframes slideLeftFade {
+    from {
+        opacity: 0;
+        transform: translateX(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.how-it-works-image:hover .feature-img {
+    transform: scale(1.02);
+}
+        /* Color overlay for the image */
+        .how-it-works-image .feature-img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            mix-blend-mode: multiply;
+            transition: transform 0.5s ease-out;
+    transform-style: preserve-3d;
+    will-change: transform;
+    border-radius: 20px;
+        }
+.how-it-works-title,
+.how-it-works-description,
+.steps-container {
+    opacity: 0;
+    transform: translateX(-50px);
+    transition: all 0.8s ease-out;
+}
+
+.how-it-works-title.animate {
+    opacity: 1;
+    transform: translateX(0);
+    transition-delay: 0.2s;
+}
+
+.how-it-works-description.animate {
+    opacity: 1;
+    transform: translateX(0);
+    transition-delay: 0.4s;
+}
+
+.steps-container.animate {
+    opacity: 1;
+    transform: translateX(0);
+    transition-delay: 0.6s;
+}        
+        /* Meet Our Team Section */
+        .team-section {
+            padding: 0 50px;
+            margin-bottom: 100px;
+        }
+        
+        .team-title {
+            text-align: center;
+            color: #5C5263;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 60px;
+            font-family: 'Montserrat';
+        }
+        
+        .team-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            position: relative;
+    min-height: 500px;
+    cursor: pointer;
+    perspective: 1000px;
+        }
+        
+        .team-member {
+            width: 300px;
+            height: 430px;
+            border-radius: 40px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: absolute;
+    top: 0;
+    left: 50%;
+    transform-origin: bottom center;
+    transition: all 0.6s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+    z-index: 1;
+        }
+        .team-member:nth-child(1) {
+    transform: translateX(-50%) rotate(-22deg);
+    z-index: 4;
+}
+
+.team-member:nth-child(2) {
+    transform: translateX(calc(-50% + 20px)) rotate(-7deg);
+    z-index: 3;
+    opacity: 0.9;
+}
+
+.team-member:nth-child(3) {
+    transform: translateX(calc(-50% + 40px)) rotate(7deg);
+    z-index: 2;
+    opacity: 0.8;
+}
+
+.team-member:nth-child(4) {
+   transform: translateX(calc(-50% + 60px)) rotate(22deg);
+    z-index: 1;
+    opacity: 0.7;
+}
+
+.team-container.spread .team-member {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+    opacity: 1;
+    z-index: 1;
+     margin: 0 10px;
+}
+
+.team-container.spread .team-member:nth-child(1) {
+    transform: translateX(0);
+}
+
+.team-container.spread .team-member:nth-child(2) {
+    transform: translateX(0);
+}
+
+.team-container.spread .team-member:nth-child(3) {
+    transform: translateX(0);
+}
+
+.team-container.spread .team-member:nth-child(4) {
+    transform: translateX(0);
+}
+
+        
+        .member-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .member-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(180deg, rgba(125, 110, 131, 0) 0%, #7D6E83 72%);
+            color: white;
+            text-align: center;
+        }
+        
+        .member-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            font-family: 'Poppins';
+        }
+        
+        .member-id {
+            font-size: 16px;
+            font-weight: 500;
+            font-family: 'Poppins';
+        }
+        
+        footer {
+            width: 100%;
+            padding: 20px 0;
+            background: #D9D9D9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .footer-text {
+            color: #1E1E1E;
+            font-size: 18px;
+            font-weight: 500;
+            font-family: 'Montserrat';
+        }
+        
+        @media (max-width: 1200px) {
+            .hero-title {
+                font-size: 2.8rem;
+            }
+            
+            .hero-description {
+                font-size: 1.1rem;
+                width: 100%;
+            }
+            
+            .features-title, .how-it-works-title, .team-title {
+                font-size: 2.2rem;
+            }
+            
+            .feature-title {
+                font-size: 24px;
+            }
+            
+            .feature-description {
+                font-size: 16px;
+            }
+            
+            .how-it-works-description {
+                font-size: 1.1rem;
+                width: 70%;
+            }
+            
+            .step-title, .step-description {
+                font-size: 18px;
+            }
+            
+            .steps-container {
+                width: 70%;
+            }
+            
+            .how-it-works-image {
+                width: 350px;
+                height: 350px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .navbar {
+                padding: 10px 30px;
+            }
+            
+            .hero-section {
+                flex-direction: column;
+                padding: 120px 30px 50px;
+            }
+            
+            .hero-content {
+                width: 100%;
+                margin-bottom: 40px;
+            }
+            
+            .hero-image-container {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .hero-image {
+                max-width: 100%;
+            }
+            
+            .how-it-works-description {
+                width: 100%;
+            }
+            
+            .steps-container {
+                width: 100%;
+            }
+            
+            .how-it-works-image {
+                position: relative;
+                right: auto;
+                top: auto;
+                width: 100%;
+                height: 300px;
+                margin-top: 40px;
+            }
+            
+            .team-member {
+                width: 280px;
+                height: 400px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .menu-toggle {
+                display: flex;
+                position: absolute;
+                right: 20px;
+                top: 25px;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                width: 100%;
+                align-items: flex-start;
+                gap: 15px;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.5s ease;
+            }
+            
+            .nav-links.active {
+                max-height: 300px;
+            }
+            
+            .nav-link {
+                width: 100%;
+                padding: 8px 0;
+            }
+            
+            .estimate-btn {
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            .hero-section {
+                padding: 100px 20px 40px;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+                margin-bottom: 20px;
+            }
+            
+            .hero-description {
+                font-size: 1rem;
+                margin-bottom: 30px;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .hero-btn {
+                width: 100%;
+            }
+            
+            .features-container {
+                padding: 0 20px;
+            }
+            
+            .features-title, .how-it-works-title, .team-title {
+                font-size: 1.8rem;
+                margin: 40px 0;
+            }
+            
+            .how-it-works, .team-section {
+                padding: 0 20px;
+            }
+            
+            .step {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .step-number {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            
+            .team-member {
+                width: 250px;
+                height: 360px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .feature-card {
+                width: 100%;
+                height: auto;
+                margin-bottom: 60px;
+            }
+            
+            .feature-content {
+                height: auto;
+                padding-bottom: 40px;
+            }
+            
+            .team-member {
+                width: 100%;
+                height: 450px;
+                margin-bottom: 30px;
+            }
+            
+            .member-name {
+                font-size: 18px;
+            }
+            
+            .member-id {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="welcome-overlay" id="welcomeOverlay">
+    <img src="{{ url_for('static', filename='welcome.png') }}" alt="Welcome" class="welcome-image">
+</div>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo-container">
+            <img class="logo-img" src="{{ url_for('static', filename='gambar1.png') }}" alt="Logo">
+            <div class="logo-text">House<br/>Prediction</div>
+        </div>
+        <div class="menu-toggle" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="nav-links" id="navLinks">
+            <a href="{{ url_for('home') }}" class="nav-link active">Home</a>
+            <a href="{{ url_for('visualization') }}" class="nav-link">Visualization</a>
+            <a href="{{ url_for('dataset') }}" class="nav-link">Dataset</a>
+            <a href="{{ url_for('about') }}" class="nav-link">About</a>
+            <a href="{{ url_for('prediction') }}" class="estimate-btn">Estimate Now!</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1 class="hero-title">Know Your Home Value Instantly</h1>
+            <p class="hero-description">Our smart platform helps you instantly estimate property values in Tebet and South Jakarta, using advanced algorithms and up-to-date housing data.</p>
+            <div class="hero-buttons">
+                <a href="{{ url_for('prediction') }}" class="predict-btn">Try Prediction Now
+                    <div class="icon">
+            <svg height="24" width="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0 0h24v24H0z" fill="none"></path>
+                <path d="M16.172 11l-5.364-5.364 1.414-1.414L20 12l-7.778 7.778-1.414-1.414L16.172 13H4v-2z" fill="currentColor"></path>
+            </svg>
+        </div>
+                </a>
+                <a href="#how-it-works" class="learn-btn">
+                    <span class="learn-btn-text">Learn How It Works</span>
+        <span class="learn-btn-border"></span>
+                </a>
+            </div>
+        </div>
+        <div class="hero-image-container">
+            <img class="hero-image" src="{{ url_for('static', filename='gambar2.png') }}" alt="House Illustration">
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <h2 class="features-title">Know Your Home Value Instantly</h2>
+
+    <div class="features-container" onclick="toggleCards()">
+        <div class="feature-card glass" style="--r: -5;">
+            <div class="feature-img-container">
+                <img class="feature-img" src="{{ url_for('static', filename='gambar3.png') }}" alt="Feature 1">
+            </div>
+            <div class="feature-content">
+                <h3 class="feature-title">Accurate Data</h3>
+                <p class="feature-description">We focus on properties in Tebet and South Jakarta, ensuring predictions are based on relevant and up-to-date local market data.</p>
+            </div>
+        </div>
+
+        <div class="feature-card glass" style="--r: -5;">
+            <div class="feature-img-container">
+                <img class="feature-img" src="{{ url_for('static', filename='gambar4.png') }}" alt="Feature 2">
+            </div>
+            <div class="feature-content">
+                <h3 class="feature-title">Instant Results</h3>
+                <p class="feature-description">Get price predictions within seconds—no waiting, no complexity, just fast and actionable results at your fingertips.</p>
+            </div>
+        </div>
+
+        <div class="feature-card glass" style="--r: -5;">
+            <div class="feature-img-container">
+                <img class="feature-img" src="{{ url_for('static', filename='gambar5.png') }}" alt="Feature 3">
+            </div>
+            <div class="feature-content">
+                <h3 class="feature-title">AI Predictions</h3>
+                <p class="feature-description">Our intelligent system uses machine learning and real estate trends to provide reliable estimates that reflect the current market.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works" id="how-it-works">
+        <h2 class="how-it-works-title">How Our Prediction System Works</h2>
+        <p class="how-it-works-description">Our smart platform helps you instantly estimate property values in Tebet and South Jakarta, using advanced algorithms and up-to-date housing data.</p>
+
+        <div class="steps-container">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3 class="step-title">Enter Property Details</h3>
+                    <p class="step-description">Input key info like land/building area, number of bedrooms, and location specifics.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3 class="step-title">AI Analyzes the Data</h3>
+                    <p class="step-description">Our machine learning model processes the data using trained algorithms based on local market patterns.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3 class="step-title">Instant Price Prediction</h3>
+                    <p class="step-description">Get real-time estimation based on market trends and historical data specific to South Jakarta neighborhoods.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="how-it-works-image">
+            <img class="feature-img" src="{{ url_for('static', filename='gambar6.png') }}" alt="How it works illustration">
+        </div>
+    </section>
+
+    <!-- Meet Our Team Section -->
+    <section class="team-section">
+        <h2 class="team-title">Meet Our Team</h2>
+        
+        <div class="team-container">
+            <div class="team-member">
+                <img class="member-image" src="{{ url_for('static', filename='nauma.png') }}" alt="Team Member 1">
+                <div class="member-info">
+                    <h3 class="member-name">Naufal Maulana</h3>
+                    <p class="member-id">2423600008</p>
+                </div>
+            </div>
+            
+            <div class="team-member">
+                <img class="member-image" src="{{ url_for('static', filename='naufal.png') }}" alt="Team Member 2">
+                <div class="member-info">
+                    <h3 class="member-name">Muhammad Naufal Abdurrosyid</h3>
+                    <p class="member-id">2423600019</p>
+                </div>
+            </div>
+            
+            <div class="team-member">
+                <img class="member-image" src="{{ url_for('static', filename='fitri.png') }}" alt="Team Member 3">
+                <div class="member-info">
+                    <h3 class="member-name">Fitrotul Islamiyah Bukhori</h3>
+                    <p class="member-id">2423600023</p>
+                </div>
+            </div>
+            
+            <div class="team-member">
+                <img class="member-image" src="{{ url_for('static', filename='zahra.png') }}" alt="Team Member 4">
+                <div class="member-info">
+                    <h3 class="member-name">Wajihah Zahrah Ramadhani</h3>
+                    <p class="member-id">2423600030</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p class="footer-text">Copyright© 2025 House Prediction. All Right Reserved</p>
+    </footer>
+
+    <script>
+        // Welcome screen functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const welcomeOverlay = document.getElementById('welcomeOverlay');
+    const body = document.body;
+    
+    // Check if welcome has been shown before
+    if (!sessionStorage.getItem('welcomeShown')) {
+        // Show welcome screen after a short delay
+        setTimeout(() => {
+            welcomeOverlay.classList.add('active');
+            body.classList.add('welcome-active');
+            sessionStorage.setItem('welcomeShown', 'true');
+        }, 500);
+    }
+    
+    // Close welcome screen when clicked
+    welcomeOverlay.addEventListener('click', function() {
+        welcomeOverlay.classList.remove('active');
+        body.classList.remove('welcome-active');
+    });
+});
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
+
+        // Close menu when clicking on a link
+        document.querySelectorAll('.nav-link, .estimate-btn').forEach(link => {
+            link.addEventListener('click', () => {
+                const navLinks = document.getElementById('navLinks');
+                if (window.innerWidth <= 768) {
+                    navLinks.classList.remove('active');
+                }
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const navLinks = document.getElementById('navLinks');
+            if (window.innerWidth > 768 && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+            }
+        });
+        
+    // Trigger animasi saat halaman selesai load
+    window.addEventListener('DOMContentLoaded', (event) => {
+        const heroContent = document.querySelector('.hero-content');
+        heroContent.classList.add('slide-right-fade');
+        // Tambahkan shine effect ke hero title
+    const heroTitle = document.querySelector('.hero-title');
+    heroTitle.classList.add('shine-effect');
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+    const heroContainer = document.querySelector('.hero-image-container');
+    const heroImg = document.querySelector('.hero-image');
+    
+    // Tunggu sampai animasi slide-in selesai (1.2s)
+    setTimeout(() => {
+        if (heroContainer && heroImg) {
+            heroContainer.addEventListener('mousemove', (e) => {
+                const x = e.clientX - heroContainer.getBoundingClientRect().left;
+                const y = e.clientY - heroContainer.getBoundingClientRect().top;
+                
+                const centerX = heroContainer.offsetWidth / 2;
+                const centerY = heroContainer.offsetHeight / 2;
+                
+                const angleX = (y - centerY) / 20;
+                const angleY = (centerX - x) / 20;
+                
+                heroImg.style.transform = `rotateX(${angleX}deg) rotateY(${angleY}deg) scale(1.03)`;
+            });
+            
+            heroContainer.addEventListener('mouseleave', () => {
+                heroImg.style.transform = 'rotateX(0) rotateY(0) scale(1)';
+            });
+        }
+    }, 1200); // Sesuaikan dengan durasi animasi slide-in (1.2s = 1200ms)
+});
+let isSpread = false; // Status awal: berkumpul
+
+function toggleCards() {
+    const featureCards = document.querySelectorAll('.feature-card');
+    
+    if (isSpread) {
+        // Kembali ke posisi berkumpul
+        featureCards.forEach(card => {
+            card.classList.remove('active');
+        });
+    } else {
+        // Menyebar
+        featureCards.forEach(card => {
+            card.classList.add('active');
+        });
+    }
+    
+    isSpread = !isSpread; // Toggle status
+}
+
+// Tambahkan script ini di bagian script yang sudah ada
+document.querySelector('.team-container').addEventListener('click', function() {
+    this.classList.toggle('spread');
+});
+
+ // Scroll animation for how-it-works section (optimized version)
+    function isElementInViewport(el) {
+        const rect = el.getBoundingClientRect();
+        return (
+            rect.top <= (window.innerHeight || document.documentElement.clientHeight) * 0.75 &&
+            rect.bottom >= 0
+        );
+    }
+
+    function handleScrollAnimations() {
+        const howItWorksSection = document.querySelector('.how-it-works');
+        if (howItWorksSection) {
+            const elements = [
+                howItWorksSection.querySelector('.how-it-works-title'),
+                howItWorksSection.querySelector('.how-it-works-description'),
+                howItWorksSection.querySelector('.steps-container'),
+                howItWorksSection.querySelector('.how-it-works-image')
+            ];
+
+            const isSectionInView = isElementInViewport(howItWorksSection);
+
+            elements.forEach(el => {
+                if (el) {
+                    if (isSectionInView) {
+                        el.classList.add('animate');
+                    } else {
+                        el.classList.remove('animate');
+                    }
+                }
+            });
+        }
+    }
+
+    // How-it-works image hover effect (only added when visible)
+    const howItWorksImage = document.querySelector('.how-it-works-image');
+    const howItWorksImg = howItWorksImage?.querySelector('.feature-img');
+
+    function setupHowItWorksHover() {
+        if (howItWorksImage && howItWorksImg) {
+            howItWorksImage.addEventListener('mousemove', (e) => {
+                const x = e.clientX - howItWorksImage.getBoundingClientRect().left;
+                const y = e.clientY - howItWorksImage.getBoundingClientRect().top;
+                
+                const centerX = howItWorksImage.offsetWidth / 2;
+                const centerY = howItWorksImage.offsetHeight / 2;
+                
+                const angleX = (y - centerY) / 20;
+                const angleY = (centerX - x) / 20;
+                
+                howItWorksImg.style.transform = `rotateX(${angleX}deg) rotateY(${angleY}deg) scale(1.03)`;
+            });
+            
+            howItWorksImage.addEventListener('mouseleave', () => {
+                howItWorksImg.style.transform = 'rotateX(0) rotateY(0) scale(1)';
+            });
+        }
+    }
+
+    // Check if how-it-works image is visible to add hover effect
+    function checkHowItWorksImageVisibility() {
+        if (!howItWorksImage) return;
+        
+        const isVisible = isElementInViewport(howItWorksImage);
+        
+        if (isVisible) {
+            // Add hover effect after animation completes
+            setTimeout(setupHowItWorksHover, 1200);
+        } else if (howItWorksImg) {
+            // Reset transform when not visible
+            howItWorksImg.style.transform = 'rotateX(0) rotateY(0) scale(1)';
+        }
+    }
+
+    // Initial checks
+    handleScrollAnimations();
+    checkHowItWorksImageVisibility();
+
+    // Event listeners
+    window.addEventListener('scroll', () => {
+        handleScrollAnimations();
+        checkHowItWorksImageVisibility();
+    });
+    
+    // Hero content animation
+    const heroContent = document.querySelector('.hero-content');
+    heroContent?.classList.add('slide-right-fade');
+    
+    // Shine effect for hero title
+    const heroTitle = document.querySelector('.hero-title');
+    heroTitle?.classList.add('shine-effect');
+    </script>
+</body>
+</html>

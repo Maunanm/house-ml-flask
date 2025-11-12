@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Prediction - Property Insights Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Montserrat', sans-serif;
+        }
+        
+        body {
+            background: #F5F5F7;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            width: 100%;
+            height: auto;
+            min-height: 70px;
+            background: #F5F5F7;
+            box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.30);
+            border-bottom-right-radius: 30px;
+            border-bottom-left-radius: 30px;
+            position: fixed;
+            top: -100px;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            padding: 10px 50px;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            animation: slideDown 0.8s ease-out forwards;
+            animation-delay: 0.3s;
+        }
+
+        @keyframes slideDown {
+            from {
+                top: -100px;
+                opacity: 0;
+            }
+            to {
+                top: 0;
+                opacity: 1;
+            }
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-img {
+            width: 50px;
+            height: 50px;
+            transition: transform 0.5s ease;
+        }
+        
+        .logo-img:hover {
+            transform: rotate(15deg) scale(1.1);
+        }
+        
+        .logo-text {
+            color: black;
+            font-size: 17px;
+            font-weight: 700;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
+        
+        .nav-link {
+            color: #5C5263;
+            font-size: 16px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            padding: 5px 0;
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: #A79CB0;
+            transform: translateY(-2px);
+        }
+        
+        .nav-link::before {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: #A79CB0;
+            transition: width 0.3s ease;
+        }
+        
+        .nav-link:hover::before {
+            width: 100%;
+        }
+        
+        .nav-link.active {
+            color: #A79CB0;
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 3px;
+            background: #A79CB0;
+            bottom: -3px;
+            left: 0;
+            border-radius: 2px;
+        }
+        
+        .estimate-btn {
+            position: relative;
+            padding: 12px 24px;
+            border-radius: 15px;
+            border: 1px solid #7D6E83;
+            font-size: 15px;
+            font-weight: 700;
+            background: transparent;
+            color: #5C5263;
+            overflow: hidden;
+            box-shadow: 0 0 0 0 transparent;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .estimate-btn:hover {
+            background: #7D6E83;
+            color: #fff;
+            box-shadow: 0 0 30px 5px rgba(125, 110, 131, 0.6);
+            transform: translateY(-3px);
+        }
+
+        .estimate-btn:active {
+            transform: translateY(1px);
+        }
+        
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 30px;
+            height: 21px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .menu-toggle:hover {
+            transform: scale(1.1);
+        }
+        
+        .menu-toggle span {
+            height: 3px;
+            width: 100%;
+            background-color: #5C5263;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+        
+        .menu-toggle.active span:nth-child(1) {
+            transform: translateY(9px) rotate(45deg);
+        }
+        
+        .menu-toggle.active span:nth-child(2) {
+            opacity: 0;
+        }
+        
+        .menu-toggle.active span:nth-child(3) {
+            transform: translateY(-9px) rotate(-45deg);
+        }
+        
+        .hero-section {
+            width: 100%;
+            min-height: 350px;
+            background: linear-gradient(49deg, #7D6E83 0%, #4B4453 50%, #2E2E3A 100%);
+            background-size: 300% 300%;
+            animation: gradientLoop 8s ease infinite, fadeIn 1s ease-out;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 130px 50px 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            margin: 0 auto;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .hero-section::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                              linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            pointer-events: none;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 20px; }
+        }
+
+        @keyframes gradientLoop {
+            0% {
+                background-position: 0% 50%;
+            }
+            50% {
+                background-position: 100% 50%;
+            }
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+        
+        .hero-title {
+            color: white;
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            font-family: 'Montserrat';
+            line-height: 1.2;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            animation: titleEntrance 1s ease-out, float 6s ease-in-out infinite;
+        }
+
+        @keyframes titleEntrance {
+            0% {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .hero-title.shine-effect {
+            display: inline-block;
+            background: linear-gradient(to right, 
+                rgba(159, 159, 159, 0.8) 0%, 
+                rgba(255, 255, 255, 1) 50%, 
+                rgba(134, 134, 134, 0.8) 100%);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            animation: shineLoop 4s infinite linear;
+            animation-delay: 0.8s;
+        }
+
+        @keyframes shineLoop {
+            0% {
+                background-position: -100% center;
+            }
+            50% {
+                background-position: 100% center;
+            }
+            100% {
+                background-position: -100% center;
+            }
+        }
+        
+        .hero-description {
+            color: white;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 30px;
+            font-family: 'Montserrat';
+            max-width: 800px;
+            line-height: 1.5;
+            opacity: 0;
+            filter: blur(5px);
+            animation: fadeInBlur 1.2s ease-out forwards;
+            animation-delay: 0.8s;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        
+        @keyframes fadeInBlur {
+            from {
+                opacity: 0;
+                filter: blur(5px);
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                filter: blur(0);
+                transform: translateY(0);
+            }
+        }
+
+        .dashboard-container {
+            padding: 50px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .dashboard-card {
+            width: 100%;
+            background: linear-gradient(180deg, #E8E0EB 0%, #C4BBC8 100%);
+            box-shadow: 0px 8px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            margin-bottom: 40px;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.6s ease-out;
+        }
+
+        .dashboard-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .dashboard-card:nth-child(1) { transition-delay: 0.2s; }
+        .dashboard-card:nth-child(2) { transition-delay: 0.4s; }
+        .dashboard-card:nth-child(3) { transition-delay: 0.6s; }
+        
+        .card-header {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 30px;
+        }
+        
+        .card-title {
+            color: #5C5263;
+            font-family: 'Montserrat';
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 15px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .card-title::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 4px;
+            background: #7D6E83;
+            bottom: -8px;
+            left: 0;
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .dashboard-card:hover .card-title::after {
+            width: 100px;
+        }
+        
+        .card-description {
+            color: #2E2E2E;
+            font-family: 'Montserrat';
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-card:hover .card-description {
+            transform: translateX(5px);
+        }
+        
+        .chart-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .dashboard-card:hover .chart-container {
+            transform: scale(1.01);
+        }
+        
+        .chart-placeholder {
+            width: 100%;
+            height: 350px;
+            background-color: #D9D9D9;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #5C5263;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        
+        footer {
+            width: 100%;
+            padding: 20px 0;
+            background: #D9D9D9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 50px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, #7D6E83, #4B4453, #2E2E3A);
+            animation: gradientFlow 4s linear infinite;
+            background-size: 200% 100%;
+        }
+
+        @keyframes gradientFlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .footer-text {
+            color: #1E1E1E;
+            font-size: 18px;
+            font-weight: 500;
+            font-family: 'Montserrat';
+            position: relative;
+        }
+
+        .footer-text::after {
+            content: '♥';
+            position: absolute;
+            right: -20px;
+            color: #ff4757;
+            animation: heartbeat 1.5s infinite;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.1); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        @media (max-width: 1200px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-description {
+                font-size: 1.1rem;
+            }
+            
+            .card-title {
+                font-size: 24px;
+            }
+            
+            .card-description {
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .navbar {
+                padding: 10px 30px;
+            }
+            
+            .dashboard-container {
+                padding: 30px;
+            }
+            
+            .dashboard-card {
+                padding: 30px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .menu-toggle {
+                display: flex;
+                position: absolute;
+                right: 20px;
+                top: 25px;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                width: 100%;
+                align-items: flex-start;
+                gap: 15px;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.5s ease;
+            }
+            
+            .nav-links.active {
+                max-height: 300px;
+            }
+            
+            .nav-link {
+                width: 100%;
+                padding: 8px 0;
+            }
+            
+            .estimate-btn {
+                width: 100%;
+                margin-top: 10px;
+            }
+            
+            .hero-section {
+                padding: 100px 20px 40px;
+                min-height: 300px;
+            }
+            
+            .hero-title {
+                font-size: 2rem;
+                margin-bottom: 15px;
+            }
+            
+            .hero-description {
+                font-size: 1rem;
+                margin-bottom: 20px;
+            }
+            
+            .dashboard-container {
+                padding: 20px;
+            }
+            
+            .dashboard-card {
+                padding: 20px;
+            }
+            
+            .card-title {
+                font-size: 20px;
+            }
+            
+            .card-description {
+                font-size: 14px;
+            }
+            
+            .chart-placeholder {
+                height: 250px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.8rem;
+            }
+            
+            .hero-description {
+                font-size: 0.9rem;
+            }
+            
+            .dashboard-card {
+                padding: 15px;
+            }
+            
+            .chart-placeholder {
+                height: 200px;
+                font-size: 16px;
+            }
+            
+            .footer-text {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo-container">
+            <img class="logo-img" src="{{ url_for('static', filename='gambar1.png') }}" alt="Logo">
+            <div class="logo-text">House<br/>Prediction</div>
+        </div>
+        <div class="menu-toggle" onclick="toggleMenu()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="nav-links" id="navLinks">
+            <a href="{{ url_for('home') }}" class="nav-link">Home</a>
+            <a href="{{ url_for('visualization') }}" class="nav-link active">Visualization</a>
+            <a href="{{ url_for('dataset') }}" class="nav-link">Dataset</a>
+            <a href="{{ url_for('about') }}" class="nav-link">About</a>
+            <a href="{{ url_for('prediction') }}" class="estimate-btn">Estimate Now!</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <h1 class="hero-title shine-effect">Property Insights Dashboard</h1>
+        <p class="hero-description">Explore essential property data through interactive charts that help you see the bigger picture whether you're buying, selling, or just browsing.</p>
+    </section>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-container">
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2 class="card-title">Land Area Overview</h2>
+                <p class="card-description">Explore essential property data through interactive charts that help you see the bigger picture whether you're buying, selling, or just browsing.</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="landAreaChart"></canvas>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2 class="card-title">Bedroom Count Breakdown</h2>
+                <p class="card-description">Get a clear view of how many bedrooms most homes offer. Whether you're looking for a cozy studio or a family-friendly four-bedroom house, this chart gives you a quick snapshot of what's out there.</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="bedroomChart"></canvas>
+            </div>
+        </div>
+
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h2 class="card-title">House Price Trends</h2>
+                <p class="card-description">Follow house prices across different areas and property types. This dynamic chart helps you understand pricing patterns so you can make smarter decisions—whether you're investing or moving in.</p>
+            </div>
+            <div class="chart-container">
+                <canvas id="priceChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p class="footer-text">Copyright© 2025 House Prediction. All Right Reserved</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Initialize charts
+        function initCharts() {
+            // Land Area Chart
+            fetch('/api/land-area-data')
+                .then(res => res.json())
+                .then(data => {
+                    if (!data.success) throw new Error(data.error);
+                    const ctx = document.getElementById('landAreaChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                label: 'Jumlah Properti',
+                                data: data.values,
+                                backgroundColor: '#7D6E83',
+                                borderRadius: 8
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                legend: { display: false },
+                                title: {
+                                    display: true,
+                                    text: 'Distribusi Luas Tanah (m²)',
+                                    font: { size: 18 }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: { stepSize: 1 }
+                                }
+                            },
+                            animation: {
+                                duration: 1500,
+                                easing: 'easeOutQuart'
+                            }
+                        }
+                    });
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Gagal memuat data chart.');
+                });
+
+            // Bedroom Chart
+            fetch('/api/bedroom-data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const ctx = document.getElementById('bedroomChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: data.labels,
+                                datasets: [{
+                                    label: 'Jumlah Rumah',
+                                    data: data.values,
+                                    backgroundColor: '#7D6E83',
+                                    borderRadius: 8
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: { display: false },
+                                    title: {
+                                        display: true,
+                                        text: 'Distribusi Banyak Kamar',
+                                        font: { size: 18 }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: { stepSize: 1 }
+                                    }
+                                },
+                                animation: {
+                                    duration: 1500,
+                                    easing: 'easeOutQuart'
+                                }
+                            }
+                        });
+                    } else {
+                        console.error('Gagal memuat data:', data.error);
+                    }
+                })
+                .catch(err => console.error('Error:', err));
+
+            // Price Chart
+            fetch('/api/price-data')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const ctx = document.getElementById('priceChart').getContext('2d');
+                        new Chart(ctx, {
+                            type: 'bar',
+                            data: {
+                                labels: data.labels,
+                                datasets: [{
+                                    label: 'Jumlah Rumah',
+                                    data: data.values,
+                                    backgroundColor: '#7D6E83',
+                                    borderRadius: 8
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                plugins: {
+                                    legend: { display: false },
+                                    title: {
+                                        display: true,
+                                        text: 'Persebaran Harga',
+                                        font: { size: 18 }
+                                    }
+                                },
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        ticks: { stepSize: 1 }
+                                    }
+                                },
+                                animation: {
+                                    duration: 1500,
+                                    easing: 'easeOutQuart'
+                                }
+                            }
+                        });
+                    } else {
+                        console.error('Gagal memuat data:', data.error);
+                    }
+                })
+                .catch(err => console.error('Error:', err));
+        }
+
+        // Toggle mobile menu
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            const menuToggle = document.querySelector('.menu-toggle');
+            navLinks.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+        }
+
+        // Close menu when clicking on a link
+        document.querySelectorAll('.nav-link, .estimate-btn').forEach(link => {
+            link.addEventListener('click', () => {
+                const navLinks = document.getElementById('navLinks');
+                const menuToggle = document.querySelector('.menu-toggle');
+                if (window.innerWidth <= 768) {
+                    navLinks.classList.remove('active');
+                    menuToggle.classList.remove('active');
+                }
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const navLinks = document.getElementById('navLinks');
+            if (window.innerWidth > 768 && navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                document.querySelector('.menu-toggle').classList.remove('active');
+            }
+        });
+
+        // Intersection Observer for card animations
+        const observerOptions = {
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.dashboard-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initCharts();
+            
+            // Add hover effect to cards
+            document.querySelectorAll('.dashboard-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                    this.style.boxShadow = '0 15px 20px rgba(0, 0, 0, 0.15)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '0px 8px 4px rgba(0, 0, 0, 0.1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
