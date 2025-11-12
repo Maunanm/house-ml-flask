@@ -1,0 +1,24 @@
+# Abaikan file model besar
+*.pkl
+House Price Prediction.csv
+
+# Abaikan environment virtual
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Abaikan file dan folder IDE
+.vscode/
+.idea/
+
+# Abaikan file sistem
+.DS_Store
+Thumbs.db
+
+# Abaikan file log & cache
+*.log
+*.cache
+
+# Abaikan environment file lokal
+.env
