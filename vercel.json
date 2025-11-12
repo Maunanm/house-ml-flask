@@ -5,8 +5,7 @@
       "use": "@vercel/python",
       "config": {
         "runtime": "python3.12",
-        "maxLambdaSize": "250mb",
-        "excludeFiles": "{*.pkl,*.csv,__pycache__/**,venv/**}"
+        "maxLambdaSize": "50mb"
       }
     }
   ],
